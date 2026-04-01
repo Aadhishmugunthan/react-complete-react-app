@@ -1,8 +1,16 @@
+import { useState } from "react";
 import UserForm from "./components/UserForm";
 import UserList from "./components/UserList";
 import "./App.css";
 
 function App() {
+
+  const [newUser, setNewUser] = useState(null);
+
+  const handleUserAdded = (user) => {
+    setNewUser(user);
+  };
+
   return (
     <div className="app">
 
@@ -14,11 +22,11 @@ function App() {
       <div className="container">
 
         <div className="card">
-          <UserForm />
+          <UserForm onUserAdded={handleUserAdded} />
         </div>
 
         <div className="card">
-          <UserList />
+          <UserList newUser={newUser} />
         </div>
 
       </div>

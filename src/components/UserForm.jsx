@@ -1,7 +1,8 @@
 import { useForm } from "react-hook-form";
 import { createUser } from "../services/api";
 
-const UserForm = () => {
+const UserForm = ({ onUserAdded }) => {
+
   const {
     register,
     handleSubmit,
@@ -10,14 +11,27 @@ const UserForm = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    await createUser(data);
 
-    alert("User Created");
+    try {
 
-    reset();
+      const response =
+        await createUser(data);
+
+      alert("User Created");
+
+      if (onUserAdded) {
+        onUserAdded(response.data);
+      }
+
+      reset();
+
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
+
     <div>
 
       <h2 className="title">
@@ -46,8 +60,13 @@ const UserForm = () => {
 
       </form>
 
-      {errors.name && <p>{errors.name.message}</p>}
-      {errors.email && <p>{errors.email.message}</p>}
+      {errors.name && (
+        <p>{errors.name.message}</p>
+      )}
+
+      {errors.email && (
+        <p>{errors.email.message}</p>
+      )}
 
     </div>
   );
