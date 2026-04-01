@@ -4,25 +4,22 @@ import {
   deleteUser
 } from "../services/api";
 
-const UserList = ({ newUser }) => {
+const UserList = ({
+  newUser,
+  onEditUser,
+  updatedUser
+}) => {
 
   const [users, setUsers] =
     useState([]);
 
   const fetchUsers = async () => {
 
-    try {
+    const response =
+      await getUsers();
 
-      const response =
-        await getUsers();
+    setUsers(response.data);
 
-      setUsers(response.data);
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
   };
 
   useEffect(() => {
@@ -31,46 +28,50 @@ const UserList = ({ newUser }) => {
 
   }, []);
 
-  // Add new user instantly
+  // ADD
 
   useEffect(() => {
 
     if (newUser) {
 
       setUsers((prev) => [
-
         ...prev,
-
         newUser
-
       ]);
 
     }
 
   }, [newUser]);
 
-  const handleDelete = async (id) => {
+  // UPDATE
 
-    try {
+  useEffect(() => {
 
-      await deleteUser(id);
+    if (updatedUser) {
 
-      setUsers(
-
-        users.filter(
-
-          (user) =>
-            user.id !== id
-
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === updatedUser.id
+            ? updatedUser
+            : user
         )
-
       );
 
-    } catch (error) {
-
-      console.log(error);
-
     }
+
+  }, [updatedUser]);
+
+  const handleDelete = async (id) => {
+
+    await deleteUser(id);
+
+    setUsers(
+      users.filter(
+        (user) =>
+          user.id !== id
+      )
+    );
+
   };
 
   return (
@@ -89,24 +90,49 @@ const UserList = ({ newUser }) => {
         >
 
           <span>
+
             {user.name}
+            {" | "}
+            {user.email}
+            {" | "}
+            Age: {user.age}
+            {" | "}
+            {user.nationality}
+
           </span>
 
-          <button
-            className="delete-btn"
-            onClick={() =>
-              handleDelete(user.id)
-            }
-          >
-            Delete
-          </button>
+          <div>
+
+            <button
+              onClick={() =>
+                onEditUser(user)
+              }
+              style={{
+                marginRight: "10px"
+              }}
+            >
+              Edit
+            </button>
+
+            <button
+              className="delete-btn"
+              onClick={() =>
+                handleDelete(user.id)
+              }
+            >
+              Delete
+            </button>
+
+          </div>
 
         </div>
 
       ))}
 
     </div>
+
   );
+
 };
 
 export default UserList;
