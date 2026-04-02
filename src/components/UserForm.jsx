@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { createUser, updateUser } from "../services/api";
 import { useEffect } from "react";
+import { TextField, Button, Stack } from "@mui/material";
 
 const UserForm = ({
   onUserAdded,
@@ -13,11 +14,10 @@ const UserForm = ({
     register,
     handleSubmit,
     reset,
-    setValue,
-    formState: { errors }
+    setValue
   } = useForm();
 
-  // Load data into form when editing
+  // Fill form when editing
 
   useEffect(() => {
 
@@ -30,7 +30,7 @@ const UserForm = ({
 
     }
 
-  }, [editingUser]);
+  }, [editingUser, setValue]);
 
   const onSubmit = async (data) => {
 
@@ -48,8 +48,6 @@ const UserForm = ({
 
         onUpdateUser(response.data);
 
-        alert("User Updated");
-
         clearEdit();
 
       }
@@ -62,8 +60,6 @@ const UserForm = ({
           await createUser(data);
 
         onUserAdded(response.data);
-
-        alert("User Created");
 
       }
 
@@ -79,75 +75,46 @@ const UserForm = ({
 
   return (
 
-    <div>
+    <Stack
+      spacing={2}
+      direction="row"
+      marginBottom={3}
+    >
 
-      <h2 className="title">
+      <TextField
+        label="Name"
+        {...register("name")}
+      />
 
+      <TextField
+        label="Email"
+        {...register("email")}
+      />
+
+      <TextField
+        label="Age"
+        type="number"
+        {...register("age")}
+      />
+
+      <TextField
+        label="Nationality"
+        {...register("nationality")}
+      />
+
+      <Button
+        variant="contained"
+        onClick={handleSubmit(onSubmit)}
+      >
         {editingUser
-          ? "Update User"
-          : "Add User"}
+          ? "Update"
+          : "Add"}
+      </Button>
 
-      </h2>
+    </Stack>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-
-        <input
-          placeholder="Name"
-          {...register("name", {
-            required: "Name required"
-          })}
-        />
-
-        <input
-          placeholder="Email"
-          {...register("email", {
-            required: "Email required"
-          })}
-        />
-
-        <input
-          type="number"
-          placeholder="Age"
-          {...register("age", {
-            required: "Age required"
-          })}
-        />
-
-        <input
-          placeholder="Nationality"
-          {...register("nationality", {
-            required: "Nationality required"
-          })}
-        />
-
-        <button type="submit">
-
-          {editingUser
-            ? "Update User"
-            : "Add User"}
-
-        </button>
-
-      </form>
-
-      {errors.name && (
-        <p>{errors.name.message}</p>
-      )}
-
-      {errors.email && (
-        <p>{errors.email.message}</p>
-      )}
-
-      {errors.age && (
-        <p>{errors.age.message}</p>
-      )}
-
-      {errors.nationality && (
-        <p>{errors.nationality.message}</p>
-      )}
-
-    </div>
   );
+
 };
 
 export default UserForm;

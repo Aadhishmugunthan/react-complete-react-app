@@ -1,135 +1,107 @@
-import { useEffect, useState } from "react";
 import {
-  getUsers,
-  deleteUser
-} from "../services/api";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Button
+} from "@mui/material";
 
 const UserList = ({
-  newUser,
-  onEditUser,
-  updatedUser
+  users,
+  onDelete,
+  onEdit
 }) => {
-
-  const [users, setUsers] =
-    useState([]);
-
-  const fetchUsers = async () => {
-
-    const response =
-      await getUsers();
-
-    setUsers(response.data);
-
-  };
-
-  useEffect(() => {
-
-    fetchUsers();
-
-  }, []);
-
-  // ADD
-
-  useEffect(() => {
-
-    if (newUser) {
-
-      setUsers((prev) => [
-        ...prev,
-        newUser
-      ]);
-
-    }
-
-  }, [newUser]);
-
-  // UPDATE
-
-  useEffect(() => {
-
-    if (updatedUser) {
-
-      setUsers((prev) =>
-        prev.map((user) =>
-          user.id === updatedUser.id
-            ? updatedUser
-            : user
-        )
-      );
-
-    }
-
-  }, [updatedUser]);
-
-  const handleDelete = async (id) => {
-
-    await deleteUser(id);
-
-    setUsers(
-      users.filter(
-        (user) =>
-          user.id !== id
-      )
-    );
-
-  };
 
   return (
 
-    <div>
+    <Table>
 
-      <h2 className="title">
-        User List
-      </h2>
+      <TableHead>
 
-      {users.map((user) => (
+        <TableRow>
 
-        <div
-          key={user.id}
-          className="user-item"
-        >
+          <TableCell>
+            Name
+          </TableCell>
 
-          <span>
+          <TableCell>
+            Email
+          </TableCell>
 
-            {user.name}
-            {" | "}
-            {user.email}
-            {" | "}
-            Age: {user.age}
-            {" | "}
-            {user.nationality}
+          <TableCell>
+            Age
+          </TableCell>
 
-          </span>
+          <TableCell>
+            Nationality
+          </TableCell>
 
-          <div>
+          <TableCell>
+            Actions
+          </TableCell>
 
-            <button
-              onClick={() =>
-                onEditUser(user)
-              }
-              style={{
-                marginRight: "10px"
-              }}
-            >
-              Edit
-            </button>
+        </TableRow>
 
-            <button
-              className="delete-btn"
-              onClick={() =>
-                handleDelete(user.id)
-              }
-            >
-              Delete
-            </button>
+      </TableHead>
 
-          </div>
+      <TableBody>
 
-        </div>
+        {users.map((user) => (
 
-      ))}
+          <TableRow
+            key={user.id}
+          >
 
-    </div>
+            <TableCell>
+              {user.name}
+            </TableCell>
+
+            <TableCell>
+              {user.email}
+            </TableCell>
+
+            <TableCell>
+              {user.age}
+            </TableCell>
+
+            <TableCell>
+              {user.nationality}
+            </TableCell>
+
+            <TableCell>
+
+              <Button
+                variant="outlined"
+                onClick={() =>
+                  onEdit(user)
+                }
+                style={{
+                  marginRight: "10px"
+                }}
+              >
+                Edit
+              </Button>
+
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() =>
+                  onDelete(user.id)
+                }
+              >
+                Delete
+              </Button>
+
+            </TableCell>
+
+          </TableRow>
+
+        ))}
+
+      </TableBody>
+
+    </Table>
 
   );
 

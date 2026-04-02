@@ -1,24 +1,75 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UserForm from "./components/UserForm";
 import UserList from "./components/UserList";
-import "./App.css";
+import { getUsers, deleteUser } from "./services/api";
+import { Container, Typography } from "@mui/material";
 
 function App() {
 
-  const [newUser, setNewUser] =
-    useState(null);
+  const [users, setUsers] = useState([]);
+  const [editingUser, setEditingUser] = useState(null);
 
-  const [editingUser, setEditingUser] =
-    useState(null);
+  // Fetch users from API
 
-  const [updatedUser, setUpdatedUser] =
-    useState(null);
+  const fetchUsers = async () => {
+
+    try {
+
+      const response = await getUsers();
+
+      setUsers(response.data);
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+  // Run on page load
+
+  useEffect(() => {
+
+    fetchUsers();
+
+  }, []);
+
+  // Add user
 
   const handleUserAdded = (user) => {
 
-    setNewUser(user);
+    setUsers((prev) => [
+      ...prev,
+      user
+    ]);
 
   };
+
+  // Delete user
+
+  const handleDelete = async (id) => {
+
+    try {
+
+      await deleteUser(id);
+
+      setUsers(
+        users.filter(
+          (user) =>
+            user.id !== id
+        )
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+  // Edit user
 
   const handleEditUser = (user) => {
 
@@ -26,11 +77,21 @@ function App() {
 
   };
 
-  const handleUpdateUser = (user) => {
+  // Update user
 
-    setUpdatedUser(user);
+  const handleUpdateUser = (updatedUser) => {
+
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === updatedUser.id
+          ? updatedUser
+          : user
+      )
+    );
 
   };
+
+  // Clear edit mode
 
   const clearEdit = () => {
 
@@ -40,60 +101,29 @@ function App() {
 
   return (
 
-    <div className="app">
+    <Container>
 
-      <header className="header">
+      <Typography
+        variant="h4"
+        marginBottom={3}
+      >
+        React User Management
+      </Typography>
 
-        <h1>
-          React User Management
-        </h1>
+      <UserForm
+        onUserAdded={handleUserAdded}
+        editingUser={editingUser}
+        onUpdateUser={handleUpdateUser}
+        clearEdit={clearEdit}
+      />
 
-        <p>
-          CRUD Application with API
-        </p>
+      <UserList
+        users={users}
+        onDelete={handleDelete}
+        onEdit={handleEditUser}
+      />
 
-      </header>
-
-      <div className="container">
-
-        <div className="card">
-
-          <UserForm
-            onUserAdded={
-              handleUserAdded
-            }
-            editingUser={
-              editingUser
-            }
-            onUpdateUser={
-              handleUpdateUser
-            }
-            clearEdit={
-              clearEdit
-            }
-          />
-
-        </div>
-
-        <div className="card">
-
-          <UserList
-            newUser={
-              newUser
-            }
-            updatedUser={
-              updatedUser
-            }
-            onEditUser={
-              handleEditUser
-            }
-          />
-
-        </div>
-
-      </div>
-
-    </div>
+    </Container>
 
   );
 
