@@ -4,14 +4,34 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Button
+  IconButton
 } from "@mui/material";
+
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const UserList = ({
   users,
   onDelete,
   onEdit
 }) => {
+
+  if (users.length === 0) {
+
+    return (
+
+      <p
+        style={{
+          textAlign: "center",
+          marginTop: "20px"
+        }}
+      >
+        No users found
+      </p>
+
+    );
+
+  }
 
   return (
 
@@ -71,27 +91,23 @@ const UserList = ({
 
             <TableCell>
 
-              <Button
-                variant="outlined"
+              <IconButton
+                color="primary"
                 onClick={() =>
                   onEdit(user)
                 }
-                style={{
-                  marginRight: "10px"
-                }}
               >
-                Edit
-              </Button>
+                <EditIcon />
+              </IconButton>
 
-              <Button
-                variant="contained"
+              <IconButton
                 color="error"
                 onClick={() =>
                   onDelete(user.id)
                 }
               >
-                Delete
-              </Button>
+                <DeleteIcon />
+              </IconButton>
 
             </TableCell>
 

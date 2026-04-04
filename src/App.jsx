@@ -1,129 +1,53 @@
-import { useEffect, useState } from "react";
-import UserForm from "./components/UserForm";
-import UserList from "./components/UserList";
-import { getUsers, deleteUser } from "./services/api";
-import { Container, Typography } from "@mui/material";
+import {
+  Routes,
+  Route,
+  Navigate
+} from "react-router-dom";
+
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
 
-  const [users, setUsers] = useState([]);
-  const [editingUser, setEditingUser] = useState(null);
-
-  // Fetch users from API
-
-  const fetchUsers = async () => {
-
-    try {
-
-      const response = await getUsers();
-
-      setUsers(response.data);
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-
-  };
-
-  // Run on page load
-
-  useEffect(() => {
-
-    fetchUsers();
-
-  }, []);
-
-  // Add user
-
-  const handleUserAdded = (user) => {
-
-    setUsers((prev) => [
-      ...prev,
-      user
-    ]);
-
-  };
-
-  // Delete user
-
-  const handleDelete = async (id) => {
-
-    try {
-
-      await deleteUser(id);
-
-      setUsers(
-        users.filter(
-          (user) =>
-            user.id !== id
-        )
-      );
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-
-  };
-
-  // Edit user
-
-  const handleEditUser = (user) => {
-
-    setEditingUser(user);
-
-  };
-
-  // Update user
-
-  const handleUpdateUser = (updatedUser) => {
-
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === updatedUser.id
-          ? updatedUser
-          : user
-      )
-    );
-
-  };
-
-  // Clear edit mode
-
-  const clearEdit = () => {
-
-    setEditingUser(null);
-
-  };
-
   return (
 
-    <Container>
+    <Routes>
 
-      <Typography
-        variant="h4"
-        marginBottom={3}
-      >
-        React User Management
-      </Typography>
+      {/* DEFAULT ROUTE */}
 
-      <UserForm
-        onUserAdded={handleUserAdded}
-        editingUser={editingUser}
-        onUpdateUser={handleUpdateUser}
-        clearEdit={clearEdit}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
       />
 
-      <UserList
-        users={users}
-        onDelete={handleDelete}
-        onEdit={handleEditUser}
+      {/* LOGIN */}
+
+      <Route
+        path="/login"
+        element={<Login />}
       />
 
-    </Container>
+      {/* SIGNUP */}
+
+      <Route
+        path="/signup"
+        element={<Signup />}
+      />
+
+      {/* FALLBACK */}
+
+      <Route
+        path="*"
+        element={<Navigate to="/" />}
+      />
+
+    </Routes>
 
   );
 
