@@ -1,147 +1,159 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
-  TextField,
-  Button,
   Container,
   Typography,
-  Box
+  Button
 } from "@mui/material";
 
+import UserForm from "../components/UserForm";
+import UserList from "../components/UserList";
+
 import {
-  useNavigate,
-  Link
-} from "react-router-dom";
+  getUsers,
+  deleteUser
+} from "../services/api";
 
-const user =
-  JSON.parse(
-    localStorage.getItem("user")
-  );
+const Dashboard = () => {
 
-  <h2>
-  Welcome, {user?.name}
-</h2>
+  const [users, setUsers] =
+    useState([]);
 
-const Signup = () => {
+  const [editingUser, setEditingUser] =
+    useState(null);
 
-  const navigate = useNavigate();
+  // Fetch users
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: ""
-  });
+  const fetchUsers = async () => {
 
-  const handleChange = (e) => {
+    try {
 
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+      const response =
+        await getUsers();
 
-  };
-
-  const handleSignup = () => {
-
-    if (
-      form.password !== form.confirmPassword
-    ) {
-
-      alert(
-        "Passwords do not match"
-      );
-
-      return;
+      setUsers(response.data);
 
     }
 
-    // Save user to localStorage
+    catch (error) {
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify(form)
+      console.log(error);
+
+    }
+
+  };
+
+  useEffect(() => {
+
+    fetchUsers();
+
+  }, []);
+
+  // Add user
+
+  const handleUserAdded = (user) => {
+
+    setUsers((prev) => [
+      ...prev,
+      user
+    ]);
+
+  };
+
+  // Delete user
+
+  const handleDelete = async (id) => {
+
+    try {
+
+      await deleteUser(id);
+
+      setUsers(
+        users.filter(
+          (user) =>
+            user.id !== id
+        )
+      );
+
+    }
+
+    catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+  // Edit
+
+  const handleEditUser = (user) => {
+
+    setEditingUser(user);
+
+  };
+
+  // Update
+
+  const handleUpdateUser = (updatedUser) => {
+
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === updatedUser.id
+          ? updatedUser
+          : user
+      )
     );
 
-    localStorage.setItem(
-      "isLoggedIn",
-      true
+  };
+
+  // Logout
+
+  const handleLogout = () => {
+
+    localStorage.removeItem(
+      "isLoggedIn"
     );
 
-    navigate("/");
+    window.location.href =
+      "/login";
 
   };
 
   return (
 
-    <Container
-      maxWidth="sm"
-      sx={{ mt: 8 }}
-    >
+    <Container>
 
       <Typography
         variant="h4"
-        mb={3}
+        marginBottom={3}
       >
-        Sign Up
+        React User Management
       </Typography>
 
-      <Box
-        display="flex"
-        flexDirection="column"
-        gap={2}
+      <Button
+        variant="contained"
+        color="error"
+        onClick={handleLogout}
+        sx={{ mb: 3 }}
       >
+        Logout
+      </Button>
 
-        <TextField
-          label="Full Name"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-        />
+      <UserForm
+        onUserAdded={handleUserAdded}
+        editingUser={editingUser}
+        onUpdateUser={handleUpdateUser}
+        clearEdit={() =>
+          setEditingUser(null)
+        }
+      />
 
-        <TextField
-          label="Email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-        />
-
-        <TextField
-          label="Phone Number"
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
-        />
-
-        <TextField
-          label="Password"
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-        />
-
-        <TextField
-          label="Confirm Password"
-          type="password"
-          name="confirmPassword"
-          value={form.confirmPassword}
-          onChange={handleChange}
-        />
-
-        <Button
-          variant="contained"
-          onClick={handleSignup}
-        >
-          Sign Up
-        </Button>
-
-        <Link to="/login">
-          Already have account?
-        </Link>
-
-      </Box>
+      <UserList
+        users={users}
+        onDelete={handleDelete}
+        onEdit={handleEditUser}
+      />
 
     </Container>
 
@@ -149,4 +161,4 @@ const Signup = () => {
 
 };
 
-export default Signup;
+export default Dashboard;
